@@ -7,7 +7,8 @@
 #loading data from the rda file, this loads the object loansData
 library(ggplot2)
 
-load("data/rawdata/loansData.rda",)
+setwd(dir="/home/chitra/workspace-R/data-analysis-assignment1")
+load("data/rawdata/loansData.rda")
 
 #initial look into data
 objects()
