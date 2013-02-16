@@ -106,7 +106,7 @@ boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$FICO.Range,las=2,col="bl
 # median of interest rate decreases as FICO scre increases
 
 boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$Loan.Length,las=2,col="blue")
-# median of interest rate decreases as duration of loan increases from 36 to 60 months
+# median of interest rate increases as duration of loan increases from 36 to 60 months
 
 
 boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$Loan.Purpose,las=2,col="blue")
@@ -114,13 +114,13 @@ boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$Loan.Purpose,las=2,col="
 #NOTE: number of requests for debt_consolidation is high
 
 boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$State,las=2,col="blue")
-#no remarkabke variation
+#no remarkable variation
 
 boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$Home.Ownership,las=2,col="blue")
-#no remarkabke variation
+#no remarkable variation
 
 boxplot(loanDataCleaned$Interest.Rate ~ loanDataCleaned$Employment.Length,las=2,col="blue")
-#no remarkabke variation
+#no remarkable variation
 
 #dotplots with color attributes 
 plot(loanDataCleaned$Interest.Rate,y = loanDataCleaned$FICO.Range,pch=20)
@@ -148,7 +148,45 @@ plot(x=loanDataCleaned$Interest.Rate,y = loanDataCleaned$FICO.Range,pch=20,col=l
 
 loanDataCleaned$Amount.Gap <- loanDataCleaned$Amount.Requested - loanDataCleaned$Amount.Funded.By.Investors
 hist(log(loanDataCleaned$Amount.Gap),breaks=100)
-plot(x=loanDataCleaned$Interest.Rate,y = loanDataCleaned$FICO.Range,pch=20,col=cut(loanDataCleaned$Amount.Gap,breaks=4))
+qplot(x=loanDataCleaned$Interest.Rate,y = loanDataCleaned$FICO.Range,col=cut(loanDataCleaned$Amount.Gap,breaks=4))
 #no significant variation observed
 
 qplot(x=loanDataCleaned$Interest.Rate,y = loanDataCleaned$FICO.Range,color=cut(loanDataCleaned$Debt.To.Income.Ratio,breaks=4))
+
+
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = Debt.To.Income.Ratio)
+#no significant variation observed
+
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = Monthly.Income)
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = log(Monthly.Income))
+#no significant variation observed
+
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = Open.CREDIT.Lines)
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = Open.CREDIT.Lines,color=Loan.Purpose)
+#no significant variation observed
+
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = Revolving.CREDIT.Balance)
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,size = log(Revolving.CREDIT.Balance))
+#no significant variation observed
+
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,color = Employment.Length)
+
+#combiing the effected variables
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,color = Loan.Length,size = Amount.Requested)
+
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,color = Loan.Length,size = Amount.Requested,main="FICO VS Interest Rate with Loan Length and Amount Requested",xlab="Interest Rate",ylab="FICO")
+
+### Modeling
+#Fitting a basic curve
+lm1 <- lm(Interest.Rate ~ .,data=loanDataCleaned)
+summary(lm1)
+#validating for the variables marked with significant by lm function
+qplot(data = loanDataCleaned, x=Interest.Rate,y = Inquiries.in.the.Last.6.Months)
+qplot(data = loanDataCleaned, x=Interest.Rate,y = Open.CREDIT.Lines)
+cor(loanDataCleaned$Interest.Rate,loanDataCleaned$Open.CREDIT.Lines)
+qplot(data = loanDataCleaned, x=Interest.Rate,y = log(Monthly.Income))
+
+lm2 <- lm(Interest.Rate ~ FICO.Range + Loan.Length + Amount.Requested,data=loanDataCleaned)
+plot(lm2)
+summary(lm2)
+qplot(data = loanDataCleaned, x=Interest.Rate,y = FICO.Range,color = Loan.Length,size = Amount.Funded.By.Investors)
